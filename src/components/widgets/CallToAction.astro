@@ -46,7 +46,8 @@ image = await Astro.slots.render('image'),
                   widths={[400, 768]}
                   sizes="(max-width: 768px) 100vw, 250px"
                   layout="responsive"
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                   {...(image as any)}
                 />
               )}

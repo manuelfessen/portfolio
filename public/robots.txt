@@ -1,2 +1,15 @@
+# https://manuelfessen.de/robots.txt
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemaps
+Sitemap: https://manuelfessen.de/sitemap.xml
+
+# Verhindern von Duplicate Content
+Disallow: /admin/
+Disallow: /decapcms/
+Disallow: /*?
+Disallow: /*&
+
+# Crawl-delay
+Crawl-delay: 10

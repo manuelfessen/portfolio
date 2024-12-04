@@ -3,9 +3,26 @@
 ---
 
 <!-- Skip to main content link -->
-<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded-md">
+<a href="#main-content" class="skip-link">
   Skip to main content
 </a>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.2s;
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+</style>
 
 <script>
   // Add keyboard navigation support

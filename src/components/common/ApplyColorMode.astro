@@ -1,33 +1,85 @@
 ---
 import { UI } from "portfolio:config";
 
-// TODO: This code is temporary
+const defaultTheme = UI.theme || "system";
 ---
 
-<script is:inline define:vars={{ defaultTheme: UI.theme || "system" }}>
-  function applyTheme(theme) {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
+<script is:inline define:vars={{ defaultTheme }}>
+  function setColorScheme(theme) {
+    const html = document.documentElement;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Determine actual theme
+    const actualTheme = theme === 'system' 
+      ? (systemPrefersDark.matches ? 'dark' : 'light') 
+      : theme;
+
+    // Apply theme classes and attributes
+    html.classList.toggle('dark', actualTheme === 'dark');
+    html.setAttribute('data-color-scheme', actualTheme);
+    
+    // Update localStorage
+    localStorage.setItem('theme', theme);
+
+    // Update toggle switches if they exist
+    const toggles = document.querySelectorAll('[data-aw-toggle-color-scheme]');
+    toggles.forEach(toggle => {
+      const input = toggle.querySelector('input');
+      if (input) {
+        input.checked = actualTheme !== 'dark';
+      }
+    });
+  }
+
+  // Initial theme setup
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme) {
+      setColorScheme(savedTheme);
     } else {
-      document.documentElement.classList.remove("dark");
+      setColorScheme(defaultTheme);
     }
-    const matches = document.querySelectorAll("[data-aw-toggle-color-scheme] > input");
+  }
 
-    if (matches && matches.length) {
-      matches.forEach((elem) => {
-        elem.checked = theme !== "dark";
+  // Theme toggle functionality
+  function attachThemeToggle() {
+    const toggles = document.querySelectorAll('[data-aw-toggle-color-scheme]');
+    
+    toggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setColorScheme(newTheme);
       });
-    }
+    });
   }
 
-  if ((defaultTheme && defaultTheme.endsWith(":only")) || (!localStorage.theme && defaultTheme !== "system")) {
-    applyTheme(defaultTheme.replace(":only", ""));
-  } else if (
-    localStorage.theme === "dark" ||
-    (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
-    applyTheme("dark");
-  } else {
-    applyTheme("light");
+  // System theme change listener
+  function attachSystemThemeListener() {
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    systemPrefersDark.addEventListener('change', (e) => {
+      if (localStorage.getItem('theme') === 'system') {
+        setColorScheme('system');
+      }
+    });
   }
+
+  // Initialize on script load
+  initTheme();
+  attachThemeToggle();
+  attachSystemThemeListener();
 </script>
+
+<style is:global>
+  html.dark {
+    color-scheme: dark;
+    background-color: #121212;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  html {
+    color-scheme: light;
+  }
+</style>
